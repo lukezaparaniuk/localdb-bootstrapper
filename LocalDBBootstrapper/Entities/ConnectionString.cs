@@ -1,8 +1,14 @@
-﻿namespace LocalDBBootstrapper.Entities
+﻿using System;
+
+namespace LocalDBBootstrapper.Entities
 {
+    /// <summary>
+    /// Represents a connection string. It wraps the value held internally because we need an entity to add extension
+    /// methods to to give us fluent connection string creation
+    /// </summary>
     public class ConnectionString
     {
-        public string Value { get; set; }
+        private string _value;
 
         public ConnectionString()
         {
@@ -11,28 +17,36 @@
 
         public ConnectionString(string value)
         {
-            Value = Value;
+            _value = value;
         }
 
         public override string ToString()
         {
-            return Value;
+            return _value;
         }
 
         public void Append(string value)
         {
-            Value = Value + value;
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentNullException("value");
+            }
+
+            _value = _value + value;
         }
 
-        public static ConnectionString Make
+        public static ConnectionString New()
         {
-            get
-            {
-                return new ConnectionString();
-            }
+            return new ConnectionString();
+        }
+
+        public static ConnectionString New(string value)
+        {
+            return new ConnectionString(value);
         }
     }
 
+    // Extensions methods that allow us to affect the underlying connection string using fluent syntax
     public static class ConnectionStringExtensions
     {
         public static ConnectionString Server(this ConnectionString connectionString, string instanceName)
